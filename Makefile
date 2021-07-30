@@ -19,26 +19,18 @@ APP_DIR          := $(BUILD)/apps
 CLIENT_INCLUDE   := -Iclient/include
 CLIENT_SRC       := $(wildcard client/src/*.c)
 CLIENT_OBJ_DIR   := $(BUILD)/client_objects
-LAUNCHER_INCLUDE := -Ilauncher/include
-LAUNCHER_SRC     := $(wildcard launcher/src/*.c)
-LAUNCHER_OBJ_DIR := $(BUILD)/launcher_objects
 SERVER_INCLUDE   := -Iserver/include
 SERVER_SRC       := $(wildcard server/src/*.c)
 SERVER_OBJ_DIR   := $(BUILD)/server_objects
 
 CLIENT_OBJECTS := $(CLIENT_SRC:%.c=$(CLIENT_OBJ_DIR)/%.o)
-LAUNCHER_OBJECTS := $(LAUNCHER_SRC:%.c=$(LAUNCHER_OBJ_DIR)/%.o)
 SERVER_OBJECTS := $(SERVER_SRC:%.c=$(SERVER_OBJ_DIR)/%.o)
 
-all: build $(APP_DIR)/client $(APP_DIR)/launcher $(APP_DIR)/server
+all: build $(APP_DIR)/client $(APP_DIR)/server
 
 $(CLIENT_OBJ_DIR)/%.o: %.c
 	@mkdir -p $(@D)
 	$(COMPILER) $(CFLAGS) $(CLIENT_INCLUDE) -c $< -MMD -o $@
-
-$(LAUNCHER_OBJ_DIR)/%.o: %.c
-	@mkdir -p $(@D)
-	$(COMPILER) $(CFLAGS) $(LAUNCHER_INCLUDE) -c $< -MMD -o $@
 
 $(SERVER_OBJ_DIR)/%.o: %.c
 	@mkdir -p $(@D)
@@ -47,10 +39,6 @@ $(SERVER_OBJ_DIR)/%.o: %.c
 $(APP_DIR)/client: $(CLIENT_OBJECTS)
 	@mkdir -p $(@D)
 	$(COMPILER) $(CFLAGS) -o $(APP_DIR)/client $^
-
-$(APP_DIR)/launcher: $(LAUNCHER_OBJECTS)
-	@mkdir -p $(@D)
-	$(COMPILER) $(CFLAGS) -o $(APP_DIR)/launcher $^
 
 $(APP_DIR)/server: $(SERVER_OBJECTS)
 	@mkdir -p $(@D)
@@ -61,7 +49,6 @@ $(APP_DIR)/server: $(SERVER_OBJECTS)
 build:
 	@mkdir -p $(APP_DIR)
 	@mkdir -p $(CLIENT_OBJ_DIR)
-	@mkdir -p $(LAUNCHER_OBJ_DIR)
 	@mkdir -p $(SERVER_OBJ_DIR)
 
 debug: CFLAGS += -DDEBUG -g
@@ -72,6 +59,5 @@ release: all
 
 clean:
 	-@rm -rvf $(CLIENT_OBJ_DIR)/*
-	-@rm -rvf $(LAUNCHER_OBJ_DIR)/*
 	-@rm -rvf $(SERVER_OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
