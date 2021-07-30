@@ -1,19 +1,24 @@
+#include <inttypes.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
-#include <inttypes.h>
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 // TODO: add program name to output.
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     if (argc != 2) {
-        fprintf(stderr, "server called with an incorrect count of command line arguments. expected: %d, actual: %d\n", 2, argc);
+        fprintf(
+            stderr,
+            "server called with an incorrect count of command line arguments. "
+            "expected: %d, actual: %d\n",
+            2,
+            argc);
         return EXIT_FAILURE;
     }
 
@@ -23,12 +28,12 @@ int main(int argc, char* argv[])
         int statusCode = mkfifo(pipeName, 0666);
 
         if (statusCode == -1) {
-            fprintf(stderr, "Could not create pipe with name \"%s\".\n", pipeName);
+            fprintf(
+                stderr, "Could not create pipe with name \"%s\".\n", pipeName);
             return EXIT_FAILURE;
         }
 
-        const int fileDescriptor
-            = open(pipeName, O_RDONLY);
+        const int fileDescriptor = open(pipeName, O_RDONLY);
 
         if (fileDescriptor == -1) {
             fprintf(stderr, "Could not open \"%s\"\n", pipeName);
@@ -39,8 +44,7 @@ int main(int argc, char* argv[])
         uint32_t x;
         uint32_t y;
 
-        ssize_t bytesRead
-            = read(fileDescriptor, &x, sizeof(x));
+        ssize_t bytesRead = read(fileDescriptor, &x, sizeof(x));
 
         if (bytesRead != sizeof(x)) {
             fprintf(stderr, "Could not read x.\n");
@@ -49,8 +53,7 @@ int main(int argc, char* argv[])
             return EXIT_FAILURE;
         }
 
-        bytesRead
-            = read(fileDescriptor, &y, sizeof(y));
+        bytesRead = read(fileDescriptor, &y, sizeof(y));
 
         if (bytesRead != sizeof(y)) {
             fprintf(stderr, "Could not read y.\n");
@@ -63,12 +66,16 @@ int main(int argc, char* argv[])
         y = ntohl(y);
 
         const uint32_t result = x + y;
-        printf("server: %" PRIu32 " + %" PRIu32 " = %" PRIu32 "\n", x, y, result);
+        printf(
+            "server: %" PRIu32 " + %" PRIu32 " = %" PRIu32 "\n", x, y, result);
 
         statusCode = close(fileDescriptor);
 
         if (statusCode == -1) {
-            fprintf(stderr, "Could not close file description of \"%s\"\n", pipeName);
+            fprintf(
+                stderr,
+                "Could not close file description of \"%s\"\n",
+                pipeName);
             unlink(pipeName);
             return EXIT_FAILURE;
         }
