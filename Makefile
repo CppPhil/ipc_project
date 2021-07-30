@@ -34,15 +34,15 @@ all: build $(APP_DIR)/client $(APP_DIR)/launcher $(APP_DIR)/server
 
 $(CLIENT_OBJ_DIR)/%.o: %.c
 	@mkdir -p $(@D)
-	$(COMPILER) $(CFLAGS) $(INCLUDE) -c $< -MMD -o $@
+	$(COMPILER) $(CFLAGS) $(CLIENT_INCLUDE) -c $< -MMD -o $@
 
 $(LAUNCHER_OBJ_DIR)/%.o: %.c
 	@mkdir -p $(@D)
-	$(COMPILER) $(CFLAGS) $(INCLUDE) -c $< -MMD -o $@
+	$(COMPILER) $(CFLAGS) $(LAUNCHER_INCLUDE) -c $< -MMD -o $@
 
 $(SERVER_OBJ_DIR)/%.o: %.c
 	@mkdir -p $(@D)
-	$(COMPILER) $(CFLAGS) $(INCLUDE) -c $< -MMD -o $@
+	$(COMPILER) $(CFLAGS) $(SERVER_INCLUDE) -c $< -MMD -o $@
 
 $(APP_DIR)/client: $(CLIENT_OBJECTS)
 	@mkdir -p $(@D)

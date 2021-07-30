@@ -1,0 +1,4 @@
+Have the launcher launch the other two applications using execl
+using the mode specified by the user shared memory, named pipes, or sockets
+
+
