@@ -5,8 +5,6 @@
 
 int main(void)
 {
-    printf("Launcher.\n");
-
     if (!launchProcess("server", MODE_NAMED_PIPE)) {
         fprintf(stderr, "Could not launch server!\n");
     }
