@@ -13,6 +13,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "read_u32.h"
+
 int main(int argc, char *argv[])
 {
     if (argc != 2) {
@@ -70,14 +72,24 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
 
-        printf("Please enter x and y:");
-        fflush(stdout);
-        uint32_t x;
-        uint32_t y;
-        scanf(
-            "%" PRIu32 " %" PRIu32 "\n",
-            &x,
-            &y); // TODO: Replace this with something safer.
+        printf("Please enter x:");
+        bool     ok;
+        uint32_t x = readU32(&ok);
+
+        if (!ok) {
+            fprintf(stderr, "client: could not read x.\n");
+            close(fileDescriptor);
+            return EXIT_FAILURE;
+        }
+
+        printf("Please enter y:");
+        uint32_t y = readU32(&ok);
+
+        if (!ok) {
+            fprintf(stderr, "client: could not read y.\n");
+            close(fileDescriptor);
+            return EXIT_FAILURE;
+        }
 
         x = htonl(x);
         y = htonl(y);
