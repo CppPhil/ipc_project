@@ -1,15 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <inttypes.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
+#include <arpa/inet.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     if (argc != 2) {
         fprintf(
@@ -23,20 +23,22 @@ int main(int argc, char* argv[])
 
     const char pipeName[] = "IPC_NAMED_PIPE";
 
-    
     if (strcmp(argv[1], "named_pipe") == 0) {
         const int fileDescriptor = open(pipeName, O_WRONLY);
 
         if (fileDescriptor == -1) {
             fprintf(stderr, "client: could not open \"%s\"\n", pipeName);
             return EXIT_FAILURE;
-        }        
+        }
 
         printf("Please enter x and y:");
         fflush(stdout);
         uint32_t x;
         uint32_t y;
-        scanf("%" PRIu32 " %" PRIu32 "\n", &x, &y); // TODO: Replace this with something safer.
+        scanf(
+            "%" PRIu32 " %" PRIu32 "\n",
+            &x,
+            &y); // TODO: Replace this with something safer.
 
         x = htonl(x);
         y = htonl(y);
@@ -58,7 +60,10 @@ int main(int argc, char* argv[])
         }
 
         if (close(fileDescriptor) == -1) {
-            fprintf(stderr, "client: could not close file descriptor for \"%s\"\n", pipeName);
+            fprintf(
+                stderr,
+                "client: could not close file descriptor for \"%s\"\n",
+                pipeName);
             return EXIT_FAILURE;
         }
     }
