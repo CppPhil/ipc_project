@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 // TODO: add program name to output.
 int main(int argc, char *argv[])
