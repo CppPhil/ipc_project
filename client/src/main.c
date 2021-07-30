@@ -2,7 +2,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <string.h>
+#include <stdbool.h>
+#include <time.h>
 
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -25,6 +28,32 @@ int main(int argc, char *argv[])
     const char pipeName[] = "IPC_NAMED_PIPE";
 
     if (strcmp(argv[1], "named_pipe") == 0) {
+        bool retry;
+
+        do {
+            retry = false;
+            struct stat buf;
+            int statReturnCode
+                = stat(pipeName, &buf);
+
+            if (statReturnCode == -1) { // On failure
+                if (errno == ENOENT) {  // If it's not there -> retry.
+                    retry = true;
+                    usleep(100000);
+                } else {
+                    // Otherwise it's some other error.
+                    fprintf(stderr, "client: Failure to wait for named pipe (\"%s\"), error: %s\n", pipeName, strerror(errno));
+                    return EXIT_FAILURE;
+                }
+            } else { // Success.
+                if (!S_ISFIFO(buf.st_mode)) {
+                    // If it is not a fifo -> that's an error.
+                    fprintf(stderr, "client: \"%s\" exists but is not of type FIFO.\n", pipeName);
+                    return EXIT_FAILURE;
+                }
+            }
+        } while (retry);
+
         const int fileDescriptor = open(pipeName, O_WRONLY);
 
         if (fileDescriptor == -1) {

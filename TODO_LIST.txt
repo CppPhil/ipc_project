@@ -1,6 +1,5 @@
 Have the launcher launch the other two applications using execl
 using the mode specified by the user shared memory, named pipes, or sockets
 
-TODO: HERE: 
-Client wait for fifo to exist: 
-    https://man7.org/linux/man-pages/man7/inotify.7.html
+
+Add more I/O to the applications to see what's going on.

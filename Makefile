@@ -13,7 +13,7 @@
 #
 
 COMPILER         := cc
-CFLAGS           := -pedantic-errors -Wall -Wextra -Werror -std=c99
+CFLAGS           := -pedantic-errors -Wall -Wextra -Werror -std=gnu99 -D_DEFAULT_SOURCE
 BUILD            := ./build
 APP_DIR          := $(BUILD)/apps
 CLIENT_INCLUDE   := -Iclient/include
