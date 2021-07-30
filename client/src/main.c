@@ -1,10 +1,10 @@
+#include <errno.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <string.h>
-#include <stdbool.h>
 #include <time.h>
 
 #include <arpa/inet.h>
@@ -33,22 +33,31 @@ int main(int argc, char *argv[])
         do {
             retry = false;
             struct stat buf;
-            int statReturnCode
-                = stat(pipeName, &buf);
+            int         statReturnCode = stat(pipeName, &buf);
 
             if (statReturnCode == -1) { // On failure
                 if (errno == ENOENT) {  // If it's not there -> retry.
                     retry = true;
                     usleep(100000);
-                } else {
+                }
+                else {
                     // Otherwise it's some other error.
-                    fprintf(stderr, "client: Failure to wait for named pipe (\"%s\"), error: %s\n", pipeName, strerror(errno));
+                    fprintf(
+                        stderr,
+                        "client: Failure to wait for named pipe (\"%s\"), "
+                        "error: %s\n",
+                        pipeName,
+                        strerror(errno));
                     return EXIT_FAILURE;
                 }
-            } else { // Success.
+            }
+            else { // Success.
                 if (!S_ISFIFO(buf.st_mode)) {
                     // If it is not a fifo -> that's an error.
-                    fprintf(stderr, "client: \"%s\" exists but is not of type FIFO.\n", pipeName);
+                    fprintf(
+                        stderr,
+                        "client: \"%s\" exists but is not of type FIFO.\n",
+                        pipeName);
                     return EXIT_FAILURE;
                 }
             }
