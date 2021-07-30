@@ -27,7 +27,6 @@ cd "$DIR"
 
 # Format the source files.
 format "$DIR/client"
-format "$DIR/launcher/"
 format "$DIR/server/"
 
 cd "$PREV_DIR"
