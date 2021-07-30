@@ -1,6 +1,6 @@
 #include "mode.h"
 
-const char* modeToString(Mode mode)
+const char *modeToString(Mode mode)
 {
     switch (mode) {
     case MODE_SHARED_MEMORY:

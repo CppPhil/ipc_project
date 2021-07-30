@@ -3,7 +3,6 @@
 
 int main(void)
 {
-  printf("Server.\n");
-  return EXIT_SUCCESS;
+    printf("Server.\n");
+    return EXIT_SUCCESS;
 }
-
