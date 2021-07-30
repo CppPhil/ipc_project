@@ -3,7 +3,7 @@
 
 int main(void)
 {
-  printf("%s\n", "Hello, World");
+  printf("Client.\n");
   return EXIT_SUCCESS;
 }
 

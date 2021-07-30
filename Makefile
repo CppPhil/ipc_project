@@ -1,4 +1,3 @@
-#
 # **************************************************************
 # *                Simple C++ Makefile Template                *
 # *                                                            *
@@ -13,51 +12,66 @@
 # **************************************************************
 #
 
-CC       := cc
-CCFLAGS  := -pedantic-errors -Wall -Wextra -Werror -std=c99
-BUILD    := ./build
-OBJ_DIR  := $(BUILD)/objects
-APP_DIR  := $(BUILD)/apps
-TARGET   := ipc_app
-INCLUDE  := -Iinclude/
-SRC      :=                      \
-   $(wildcard src/*.c)           \
+COMPILER         := cc
+CFLAGS           := -pedantic-errors -Wall -Wextra -Werror -std=c99
+BUILD            := ./build
+APP_DIR          := $(BUILD)/apps
+CLIENT_INCLUDE   := -Iclient/include
+CLIENT_SRC       := $(wildcard client/src/*.c)
+CLIENT_OBJ_DIR   := $(BUILD)/client_objects
+LAUNCHER_INCLUDE := -Ilauncher/include
+LAUNCHER_SRC     := $(wildcard launcher/src/*.c)
+LAUNCHER_OBJ_DIR := $(BUILD)/launcher_objects
+SERVER_INCLUDE   := -Iserver/include
+SERVER_SRC       := $(wildcard server/src/*.c)
+SERVER_OBJ_DIR   := $(BUILD)/server_objects
 
-OBJECTS  := $(SRC:%.c=$(OBJ_DIR)/%.o)
-DEPENDENCIES \
-         := $(OBJECTS:.o=.d)
+CLIENT_OBJECTS := $(CLIENT_SRC:%.c=$(CLIENT_OBJ_DIR)/%.o)
+LAUNCHER_OBJECTS := $(LAUNCHER_SRC:%.c=$(LAUNCHER_OBJ_DIR)/%.o)
+SERVER_OBJECTS := $(SERVER_SRC:%.c=$(SERVER_OBJ_DIR)/%.o)
 
-all: build $(APP_DIR)/$(TARGET)
+all: build $(APP_DIR)/client $(APP_DIR)/launcher $(APP_DIR)/server
 
-$(OBJ_DIR)/%.o: %.c
+$(CLIENT_OBJ_DIR)/%.o: %.c
 	@mkdir -p $(@D)
-	$(CC) $(CCFLAGS) $(INCLUDE) -c $< -MMD -o $@
+	$(COMPILER) $(CFLAGS) $(INCLUDE) -c $< -MMD -o $@
 
-$(APP_DIR)/$(TARGET): $(OBJECTS)
+$(LAUNCHER_OBJ_DIR)/%.o: %.c
 	@mkdir -p $(@D)
-	$(CC) $(CCFLAGS) -o $(APP_DIR)/$(TARGET) $^ $(LDFLAGS)
+	$(COMPILER) $(CFLAGS) $(INCLUDE) -c $< -MMD -o $@
 
--include $(DEPENDENCIES)
+$(SERVER_OBJ_DIR)/%.o: %.c
+	@mkdir -p $(@D)
+	$(COMPILER) $(CFLAGS) $(INCLUDE) -c $< -MMD -o $@
+
+$(APP_DIR)/client: $(CLIENT_OBJECTS)
+	@mkdir -p $(@D)
+	$(COMPILER) $(CFLAGS) -o $(APP_DIR)/client $^
+
+$(APP_DIR)/launcher: $(LAUNCHER_OBJECTS)
+	@mkdir -p $(@D)
+	$(COMPILER) $(CFLAGS) -o $(APP_DIR)/launcher $^
+
+$(APP_DIR)/server: $(SERVER_OBJECTS)
+	@mkdir -p $(@D)
+	$(COMPILER) $(CFLAGS) -o $(APP_DIR)/server $^
 
 .PHONY: all build clean debug release info
 
 build:
 	@mkdir -p $(APP_DIR)
-	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(CLIENT_OBJ_DIR)
+	@mkdir -p $(LAUNCHER_OBJ_DIR)
+	@mkdir -p $(SERVER_OBJ_DIR)
 
-debug: CCFLAGS += -DDEBUG -g
+debug: CFLAGS += -DDEBUG -g
 debug: all
 
-release: CCFLAGS += -O3 -g -DNDEBUG
+release: CFLAGS += -O3 -g -DNDEBUG
 release: all
 
 clean:
-	-@rm -rvf $(OBJ_DIR)/*
+	-@rm -rvf $(CLIENT_OBJ_DIR)/*
+	-@rm -rvf $(LAUNCHER_OBJ_DIR)/*
+	-@rm -rvf $(SERVER_OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
-
-info:
-	@echo "[*] Application dir: ${APP_DIR}     "
-	@echo "[*] Object dir:      ${OBJ_DIR}     "
-	@echo "[*] Sources:         ${SRC}         "
-	@echo "[*] Objects:         ${OBJECTS}     "
-	@echo "[*] Dependencies:    ${DEPENDENCIES}"
