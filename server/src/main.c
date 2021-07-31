@@ -10,7 +10,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-// TODO: add program name to output.
 int main(int argc, char *argv[])
 {
     if (argc != 2) {
@@ -30,14 +29,16 @@ int main(int argc, char *argv[])
 
         if (statusCode == -1) {
             fprintf(
-                stderr, "Could not create pipe with name \"%s\".\n", pipeName);
+                stderr,
+                "server: Could not create pipe with name \"%s\".\n",
+                pipeName);
             return EXIT_FAILURE;
         }
 
         const int fileDescriptor = open(pipeName, O_RDONLY);
 
         if (fileDescriptor == -1) {
-            fprintf(stderr, "Could not open \"%s\"\n", pipeName);
+            fprintf(stderr, "server: Could not open \"%s\"\n", pipeName);
             unlink(pipeName);
             return EXIT_FAILURE;
         }
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
         ssize_t bytesRead = read(fileDescriptor, &x, sizeof(x));
 
         if (bytesRead != sizeof(x)) {
-            fprintf(stderr, "Could not read x.\n");
+            fprintf(stderr, "server: Could not read x.\n");
             close(fileDescriptor);
             unlink(pipeName);
             return EXIT_FAILURE;
@@ -57,7 +58,7 @@ int main(int argc, char *argv[])
         bytesRead = read(fileDescriptor, &y, sizeof(y));
 
         if (bytesRead != sizeof(y)) {
-            fprintf(stderr, "Could not read y.\n");
+            fprintf(stderr, "server: Could not read y.\n");
             close(fileDescriptor);
             unlink(pipeName);
             return EXIT_FAILURE;
@@ -75,7 +76,7 @@ int main(int argc, char *argv[])
         if (statusCode == -1) {
             fprintf(
                 stderr,
-                "Could not close file description of \"%s\"\n",
+                "server: Could not close file description of \"%s\"\n",
                 pipeName);
             unlink(pipeName);
             return EXIT_FAILURE;
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
         statusCode = unlink(pipeName);
 
         if (statusCode == -1) {
-            fprintf(stderr, "Could not unlink \"%s\"\n", pipeName);
+            fprintf(stderr, "server: Could not unlink \"%s\"\n", pipeName);
             return EXIT_FAILURE;
         }
     }
