@@ -24,6 +24,9 @@ int main(int argc, char *argv[])
     if (strcmp(argv[1], "named_pipe") == 0) {
         exitCode |= namedPipe();
     }
+    else if (strcmp(argv[1], "socket") == 0) {
+        exitCode |= runSocketServer();
+    }
 
     return exitCode;
 }
