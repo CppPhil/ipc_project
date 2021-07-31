@@ -4,6 +4,7 @@
 
 #include "named_pipe.h"
 #include "run_socket_server.h"
+#include "shared_memory.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,6 +28,14 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[1], "socket") == 0) {
         exitCode |= runSocketServer();
+    } 
+    else if (strcmp(argv[1], "shared_memory") == 0)
+    {
+        exitCode |= sharedMemory();    
+    }
+    else {
+        // TODO: Print usage.
+        exitCode |= EXIT_FAILURE;
     }
 
     return exitCode;
