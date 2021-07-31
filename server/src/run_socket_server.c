@@ -100,7 +100,7 @@ int runSocketServer()
     socklen_t          clientSockAddrLen = sizeof(sockaddrUnClient);
     int                clientSocket      = accept(
         serverSocket,
-        (struct socktaddr *) &sockaddrUnClient,
+        (struct sockaddr *) &sockaddrUnClient,
         &clientSockAddrLen);
 
     if (clientSocket == -1) {
@@ -114,8 +114,6 @@ int runSocketServer()
         close(serverSocket);
         return EXIT_FAILURE;
     }
-
-    printf("Server: sucessfully connected to client using a socket\n");
 
     uint32_t x;
 

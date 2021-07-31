@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <unistd.h>
 
 #include "read_u32.h"
 #include "run_socket_client.h"
@@ -119,6 +120,7 @@ static bool sendData(int sock, uint32_t dataToSend)
 
     if (bytesSent == -1) {
         fprintf(
+            stderr,
             "Client: failure to send %" PRIX32 " (%" PRIX32
             " in host byte order). Error: \"%s\"\n",
             dataToSend,
@@ -128,6 +130,7 @@ static bool sendData(int sock, uint32_t dataToSend)
     }
     else if (bytesSent != (sizeof(dataToSend))) {
         fprintf(
+            stderr,
             "Client: sent %zu bytes but it should've been %zu bytes.\n",
             (size_t) bytesSent,
             sizeof(dataToSend));

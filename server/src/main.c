@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "named_pipe.h"
+#include "run_socket_server.h"
 
 int main(int argc, char *argv[])
 {
