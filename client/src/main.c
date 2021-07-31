@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "named_pipe.h"
+#include "run_socket_client.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,6 +24,9 @@ int main(int argc, char *argv[])
 
     if (strcmp(argv[1], "named_pipe") == 0) {
         exitCode |= namedPipe();
+    }
+    else if (strcmp(argv[1], "socket") == 0) {
+        exitCode |= runSocketClient();
     }
 
     return exitCode;
