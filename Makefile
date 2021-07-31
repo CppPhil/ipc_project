@@ -1,3 +1,4 @@
+#
 # **************************************************************
 # *                Simple C++ Makefile Template                *
 # *                                                            *
@@ -13,7 +14,8 @@
 #
 
 COMPILER         := cc
-CFLAGS           := -pedantic-errors -Wall -Wextra -Werror -std=gnu99 -D_DEFAULT_SOURCE
+CFLAGS           := -pedantic-errors -Wall -Wextra -Werror -std=gnu99 -pthread -D_DEFAULT_SOURCE
+LDFLAGS          := -pthread
 BUILD            := ./build
 APP_DIR          := $(BUILD)/apps
 CLIENT_INCLUDE   := -Iclient/include
@@ -38,11 +40,11 @@ $(SERVER_OBJ_DIR)/%.o: %.c
 
 $(APP_DIR)/client: $(CLIENT_OBJECTS)
 	@mkdir -p $(@D)
-	$(COMPILER) $(CFLAGS) -o $(APP_DIR)/client $^
+	$(COMPILER) $(CFLAGS) -o $(APP_DIR)/client $^ $(LDFLAGS)
 
 $(APP_DIR)/server: $(SERVER_OBJECTS)
 	@mkdir -p $(@D)
-	$(COMPILER) $(CFLAGS) -o $(APP_DIR)/server $^
+	$(COMPILER) $(CFLAGS) -o $(APP_DIR)/server $^ $(LDFLAGS)
 
 .PHONY: all build clean debug release info
 
