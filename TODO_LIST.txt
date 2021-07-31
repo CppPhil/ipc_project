@@ -1,2 +1,3 @@
 Modes: shared memory, named pipes, or sockets
 
+TODO: Add usage info when launched incorrectly.

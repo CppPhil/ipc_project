@@ -14,16 +14,22 @@ uint32_t readU32(bool *ok)
         return 0;
     }
 
-    if (!isdigit(charRead)) {
-        *ok = false;
-        return 0;
-    }
+    if (!isspace(charRead)) {
+        if (!isdigit(charRead)) {
+            *ok = false;
+            return 0;
+        }
 
-    buffer += ((unsigned char) charRead) - '0';
+        buffer += ((unsigned char) charRead) - '0';
+    }
 
     while ((charRead = getc(stdin)) != EOF) {
         if (((unsigned char) charRead) == '\n') {
             break;
+        }
+
+        if (isspace(charRead)) {
+            continue;
         }
 
         if (!isdigit(charRead)) {
