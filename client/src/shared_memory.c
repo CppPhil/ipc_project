@@ -7,7 +7,7 @@
 #include <string.h>
 
 #include <arpa/inet.h>
-#include <pthread.h>
+#include <semaphore.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
@@ -25,8 +25,7 @@ int sharedMemory()
     }
 
     static const size_t sharedMemorySize
-        = (3 * sizeof(uint32_t)) + sizeof(pthread_mutexattr_t)
-          + sizeof(pthread_mutex_t) + sizeof(bool);
+        = (3 * sizeof(uint32_t)) + sizeof(sem_t);
 
     const int sharedMemoryId = shmget(key, sharedMemorySize, 0666);
 
@@ -64,32 +63,16 @@ int sharedMemory()
     x = htonl(x);
     y = htonl(y);
 
-    uint32_t *           px        = memory;
-    uint32_t *           py        = px + 1;
-    uint32_t *           presult   = py + 1;
-    pthread_mutexattr_t *mutexAttr = (pthread_mutexattr_t *) (presult + 1);
-    pthread_mutex_t *    mutex     = (pthread_mutex_t *) (mutexAttr + 1);
-    bool *               hasClientFinished = (bool *) (mutex + 1);
-    (void) mutexAttr;
-
-    int statusCode = pthread_mutex_lock(mutex);
-
-    if (statusCode != 0) {
-        fprintf(
-            stderr, "Client: could not lock mutex: %s\n", strerror(statusCode));
-        shmdt(memory);
-        return EXIT_FAILURE;
-    }
+    uint32_t *px        = memory;
+    uint32_t *py        = px + 1;
+    uint32_t *presult   = py + 1;
+    sem_t *   semaphore = (sem_t *) (presult + 1);
 
     *px = x;
     *py = y;
 
-    *hasClientFinished = true;
-
-    statusCode = pthread_mutex_unlock(mutex);
-
-    if (statusCode != 0) {
-        fprintf(stderr, "Client: could not unlock: %s\n", strerror(statusCode));
+    if (sem_post(semaphore) == -1) {
+        fprintf(stderr, "Client: sem_post failed: %s\n", strerror(errno));
         shmdt(memory);
         return EXIT_FAILURE;
     }

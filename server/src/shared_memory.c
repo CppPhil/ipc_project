@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include <arpa/inet.h>
-#include <pthread.h>
+#include <semaphore.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/types.h>
@@ -27,8 +27,7 @@ int sharedMemory()
     }
 
     static const size_t sharedMemorySize
-        = (3 * sizeof(uint32_t)) + sizeof(pthread_mutexattr_t)
-          + sizeof(pthread_mutex_t) + sizeof(bool);
+        = (3 * sizeof(uint32_t)) + sizeof(sem_t);
 
     const int sharedMemoryId
         = shmget(key, sharedMemorySize, IPC_CREAT | IPC_EXCL | 0666);
@@ -57,103 +56,35 @@ int sharedMemory()
         return EXIT_FAILURE;
     }
 
-    uint32_t *           x         = memory;
-    uint32_t *           y         = x + 1;
-    uint32_t *           result    = y + 1;
-    pthread_mutexattr_t *mutexAttr = (pthread_mutexattr_t *) (result + 1);
-    pthread_mutex_t *    mutex     = (pthread_mutex_t *) (mutexAttr + 1);
-    bool *               hasClientFinished = (bool *) (mutex + 1);
+    uint32_t *x         = memory;
+    uint32_t *y         = x + 1;
+    uint32_t *result    = y + 1;
+    sem_t *   semaphore = (sem_t *) (result + 1);
 
-    int statusCode = pthread_mutexattr_init(mutexAttr);
+    int statusCode
+        = sem_init(/* __sem */ semaphore, /* __pshared */ 1, /* __value */ 0);
 
-    if (statusCode != 0) {
+    if (statusCode == -1) {
         fprintf(
             stderr,
-            "Server: couldn't initialize mutex attribute: %s\n",
-            strerror(statusCode));
+            "Server: could not initialize semaphore: %s\n",
+            strerror(errno));
         shmdt(memory);
         shmctl(sharedMemoryId, IPC_RMID, NULL);
         return EXIT_FAILURE;
     }
 
-    /* permit a mutex to be operated upon by any thread that has access to the
-     * memory where the mutex is allocated, even if the mutex is allocated in
-     * memory that is shared by multiple processes */
-    statusCode
-        = pthread_mutexattr_setpshared(mutexAttr, PTHREAD_PROCESS_SHARED);
+    statusCode = sem_wait(semaphore);
 
-    if (statusCode != 0) {
+    if (statusCode == -1) {
         fprintf(
             stderr,
-            "Server: couldn't set PTHREAD_PROCESS_SHARED: %s\n",
-            strerror(statusCode));
-        pthread_mutexattr_destroy(mutexAttr);
+            "Server: couldn't wait on semaphore: %s\n",
+            strerror(errno));
+        sem_destroy(semaphore);
         shmdt(memory);
         shmctl(sharedMemoryId, IPC_RMID, NULL);
         return EXIT_FAILURE;
-    }
-
-    statusCode = pthread_mutex_init(mutex, mutexAttr);
-
-    if (statusCode != 0) {
-        fprintf(
-            stderr,
-            "Server: couldn't initialize mutex: %s\n",
-            strerror(statusCode));
-        pthread_mutexattr_destroy(mutexAttr);
-        shmdt(memory);
-        shmctl(sharedMemoryId, IPC_RMID, NULL);
-        return EXIT_FAILURE;
-    }
-
-    *hasClientFinished = false;
-
-    for (;;) {
-        statusCode = pthread_mutex_lock(mutex);
-
-        if (statusCode != 0) {
-            fprintf(
-                stderr,
-                "Server: could not lock mutex: %s\n",
-                strerror(statusCode));
-            pthread_mutex_destroy(mutex);
-            pthread_mutexattr_destroy(mutexAttr);
-            shmdt(memory);
-            shmctl(sharedMemoryId, IPC_RMID, NULL);
-            return EXIT_FAILURE;
-        }
-
-        if (*hasClientFinished) {
-            break;
-        }
-
-        statusCode = pthread_mutex_unlock(mutex);
-
-        if (statusCode != 0) {
-            fprintf(
-                stderr,
-                "Server: could not unlock mutex: %s\n",
-                strerror(statusCode));
-            pthread_mutex_destroy(mutex);
-            pthread_mutexattr_destroy(mutexAttr);
-            shmdt(memory);
-            shmctl(sharedMemoryId, IPC_RMID, NULL);
-            return EXIT_FAILURE;
-        }
-
-        statusCode = usleep(100);
-
-        if (statusCode == -1) {
-            fprintf(
-                stderr,
-                "Server: failure to invoke usleep: %s\n",
-                strerror(errno));
-            pthread_mutex_destroy(mutex);
-            pthread_mutexattr_destroy(mutexAttr);
-            shmdt(memory);
-            shmctl(sharedMemoryId, IPC_RMID, NULL);
-            return EXIT_FAILURE;
-        }
     }
 
     *x = ntohl(*x);
@@ -164,22 +95,13 @@ int sharedMemory()
     printf(
         "Server: %" PRIu32 " + %" PRIu32 " = %" PRIu32 "\n", *x, *y, *result);
 
-    statusCode = pthread_mutex_destroy(mutex);
+    statusCode = sem_destroy(semaphore);
 
-    if (statusCode != 0) {
+    if (statusCode == -1) {
         fprintf(
             stderr,
-            "Server could not destroy mutex: %s\n",
-            strerror(statusCode));
-        pthread_mutexattr_destroy(mutexAttr);
-        shmdt(memory);
-        shmctl(sharedMemoryId, IPC_RMID, NULL);
-        return EXIT_FAILURE;
-    }
-
-    statusCode = pthread_mutexattr_destroy(mutexAttr);
-
-    if (statusCode != 0) {
+            "Server: failed to destroy semaphore: %s\n",
+            strerror(errno));
         shmdt(memory);
         shmctl(sharedMemoryId, IPC_RMID, NULL);
         return EXIT_FAILURE;
