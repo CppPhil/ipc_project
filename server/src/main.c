@@ -28,10 +28,9 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[1], "socket") == 0) {
         exitCode |= runSocketServer();
-    } 
-    else if (strcmp(argv[1], "shared_memory") == 0)
-    {
-        exitCode |= sharedMemory();    
+    }
+    else if (strcmp(argv[1], "shared_memory") == 0) {
+        exitCode |= sharedMemory();
     }
     else {
         // TODO: Print usage.

@@ -1,18 +1,18 @@
-#include <stdio.h>
-#include <string.h>
 #include <errno.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-#include "shared_memory.h"
 #include "read_u32.h"
+#include "shared_memory.h"
 
 int sharedMemory()
 {
@@ -28,17 +28,16 @@ int sharedMemory()
         = (3 * sizeof(uint32_t)) + sizeof(pthread_mutexattr_t)
           + sizeof(pthread_mutex_t) + sizeof(bool);
 
-    const int sharedMemoryId
-        = shmget(key, sharedMemorySize, 0666);
+    const int sharedMemoryId = shmget(key, sharedMemorySize, 0666);
 
     if (sharedMemoryId == -1) {
         fprintf(stderr, "Client: shmget failed: %s\n", strerror(errno));
         return EXIT_FAILURE;
     }
 
-    void* memory = shmat(sharedMemoryId, NULL, 0);
+    void *memory = shmat(sharedMemoryId, NULL, 0);
 
-    if (memory == (void*) -1) {
+    if (memory == (void *) -1) {
         fprintf(stderr, "Client: shmat failed: %s\n", strerror(errno));
         return EXIT_FAILURE;
     }
@@ -65,18 +64,19 @@ int sharedMemory()
     x = htonl(x);
     y = htonl(y);
 
-    uint32_t* px = memory;
-    uint32_t* py = px + 1;
-    uint32_t* presult = py + 1;
+    uint32_t *           px        = memory;
+    uint32_t *           py        = px + 1;
+    uint32_t *           presult   = py + 1;
     pthread_mutexattr_t *mutexAttr = (pthread_mutexattr_t *) (presult + 1);
     pthread_mutex_t *    mutex     = (pthread_mutex_t *) (mutexAttr + 1);
     bool *               hasClientFinished = (bool *) (mutex + 1);
-    (void)mutexAttr;
+    (void) mutexAttr;
 
     int statusCode = pthread_mutex_lock(mutex);
 
     if (statusCode != 0) {
-        fprintf(stderr, "Client: could not lock mutex: %s\n", strerror(statusCode));
+        fprintf(
+            stderr, "Client: could not lock mutex: %s\n", strerror(statusCode));
         shmdt(memory);
         return EXIT_FAILURE;
     }
@@ -94,9 +94,11 @@ int sharedMemory()
         return EXIT_FAILURE;
     }
 
-
     if (shmdt(memory) == -1) {
-        fprintf(stderr, "Client could not detach from the shared memory segment: %s\n", strerror(errno));
+        fprintf(
+            stderr,
+            "Client could not detach from the shared memory segment: %s\n",
+            strerror(errno));
         return EXIT_FAILURE;
     }
 
