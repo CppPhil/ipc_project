@@ -6,6 +6,16 @@
 #include "run_socket_server.h"
 #include "shared_memory.h"
 
+static void printUsage()
+{
+    static const char appName[] = "./server";
+    FILE *const       stream    = stderr;
+
+    fprintf(stream, "usage: %s named_pipe|socket|shared_memory\n\n", appName);
+    fprintf(stream, "Example:\n");
+    fprintf(stream, "  %s named_pipe\n\n", appName);
+}
+
 int main(int argc, char *argv[])
 {
     int exitCode = EXIT_SUCCESS;
@@ -18,6 +28,7 @@ int main(int argc, char *argv[])
             2,
             argc);
         exitCode |= EXIT_FAILURE;
+        printUsage();
         return exitCode;
     }
 
@@ -33,7 +44,7 @@ int main(int argc, char *argv[])
         exitCode |= sharedMemory();
     }
     else {
-        // TODO: Print usage.
+        printUsage();
         exitCode |= EXIT_FAILURE;
     }
 

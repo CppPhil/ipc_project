@@ -77,6 +77,7 @@ int runSocketServer()
         shutdown(serverSocket, SHUT_RDWR); /* SHUT_RDWR: Disables further send
                                               and receive operations. */
         close(serverSocket); /* Close the socket file descriptor */
+        unlink(socketName);
         return EXIT_FAILURE;
     }
 
@@ -93,6 +94,7 @@ int runSocketServer()
             strerror(errno));
         shutdown(serverSocket, SHUT_RDWR);
         close(serverSocket);
+        unlink(socketName);
         return EXIT_FAILURE;
     }
 
@@ -112,6 +114,7 @@ int runSocketServer()
             strerror(errno));
         shutdown(serverSocket, SHUT_RDWR);
         close(serverSocket);
+        unlink(socketName);
         return EXIT_FAILURE;
     }
 
@@ -123,6 +126,7 @@ int runSocketServer()
         close(clientSocket);
         shutdown(serverSocket, SHUT_RDWR);
         close(serverSocket);
+        unlink(socketName);
         return EXIT_FAILURE;
     }
 
@@ -134,6 +138,7 @@ int runSocketServer()
         close(clientSocket);
         shutdown(serverSocket, SHUT_RDWR);
         close(serverSocket);
+        unlink(socketName);
         return EXIT_FAILURE;
     }
 
@@ -150,6 +155,7 @@ int runSocketServer()
         close(clientSocket);
         shutdown(serverSocket, SHUT_RDWR);
         close(serverSocket);
+        unlink(socketName);
         return EXIT_FAILURE;
     }
 
@@ -162,6 +168,7 @@ int runSocketServer()
             strerror(errno));
         shutdown(serverSocket, SHUT_RDWR);
         close(serverSocket);
+        unlink(socketName);
         return EXIT_FAILURE;
     }
 
@@ -173,6 +180,7 @@ int runSocketServer()
             "Server: could not shut down server socket: \"%s\"\n",
             strerror(errno));
         close(serverSocket);
+        unlink(socketName);
         return EXIT_FAILURE;
     }
 
@@ -183,6 +191,13 @@ int runSocketServer()
             stderr,
             "Server: could not close server socket: \"%s\"\n",
             strerror(errno));
+        return EXIT_FAILURE;
+    }
+
+    statusCode = unlink(socketName);
+
+    if (statusCode == -1) {
+        fprintf(stderr, "Server: could not unlink \"%s\".\n", socketName);
         return EXIT_FAILURE;
     }
 

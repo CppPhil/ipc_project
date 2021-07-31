@@ -19,6 +19,8 @@ static bool sendData(int sock, uint32_t dataToSend);
 
 int runSocketClient()
 {
+    printf("client application is in socket mode.\n");
+
     static const char socketName[] = "myFancySocket";
 
     int sock = socket(AF_UNIX, SOCK_STREAM, 0);

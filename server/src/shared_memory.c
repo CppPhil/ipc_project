@@ -18,6 +18,8 @@
 
 int sharedMemory()
 {
+    printf("Server application launched in shared_memory mode.\n");
+
     static const int projectId = 1;
     key_t            key       = ftok("server", projectId);
 
