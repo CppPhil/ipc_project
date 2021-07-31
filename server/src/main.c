@@ -22,9 +22,13 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    printf("Server application launched.\n");
+
     const char pipeName[] = "IPC_NAMED_PIPE";
 
     if (strcmp(argv[1], "named_pipe") == 0) {
+        printf("Server application is in named_pipe mode.\n");
+
         int statusCode = mkfifo(pipeName, 0666);
 
         if (statusCode == -1) {

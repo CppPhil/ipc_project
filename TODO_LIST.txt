@@ -1,4 +1,2 @@
 Modes: shared memory, named pipes, or sockets
 
-Add more I/O to the applications to see what's going on.
-

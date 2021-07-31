@@ -27,9 +27,12 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    printf("client application launched.\n");
+
     const char pipeName[] = "IPC_NAMED_PIPE";
 
     if (strcmp(argv[1], "named_pipe") == 0) {
+        printf("client application is in named_pipe mode.\n");
         bool retry;
 
         do {
@@ -64,6 +67,8 @@ int main(int argc, char *argv[])
                 }
             }
         } while (retry);
+
+        printf("client: waited for named pipe \"%s\" to exist.\n", pipeName);
 
         const int fileDescriptor = open(pipeName, O_WRONLY);
 
