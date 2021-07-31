@@ -4,6 +4,7 @@
 
 #include "named_pipe.h"
 #include "run_socket_client.h"
+#include "shared_memory.h"
 
 int main(int argc, char *argv[])
 {
