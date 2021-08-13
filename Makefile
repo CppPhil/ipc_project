@@ -13,7 +13,7 @@
 # **************************************************************
 #
 
-COMPILER         := cc
+COMPILER         := clang
 CFLAGS           := -pedantic-errors -Wall -Wextra -Werror -std=gnu99 -pthread -D_DEFAULT_SOURCE
 LDFLAGS          := -pthread
 BUILD            := ./build

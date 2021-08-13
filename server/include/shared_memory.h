@@ -4,3 +4,4 @@
 int sharedMemory();
 
 #endif /* INCG_SHARED_MEMORY_H */
+
